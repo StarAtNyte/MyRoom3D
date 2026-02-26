@@ -380,6 +380,101 @@ export async function downloadGeneratedPLY() {
 }
 
 /**
+ * Load a splat directly from a user-uploaded PLY file
+ */
+export async function loadSplatFromPlyFile(plyFile, cleanupSceneFunc) {
+    const status = document.getElementById('status');
+
+    setIsLoadingScene(true);
+
+    const splatSelect = document.getElementById('splatSelect');
+    if (splatSelect) {
+        splatSelect.disabled = true;
+    }
+
+    try {
+        status.style.display = 'block';
+        status.textContent = 'Loading PLY file...';
+
+        console.log('=== LOADING SPLAT FROM PLY FILE ===');
+        console.log('File:', plyFile.name, 'Size:', (plyFile.size / 1024).toFixed(2), 'KB');
+
+        // Create a blob URL for the PLY file
+        const plyUrl = URL.createObjectURL(plyFile);
+
+        // Use default 16:9 aspect ratio (no metadata available)
+        window.splatAspectRatio = 1920 / 1080;
+
+        if (window.updateSplatViewport) {
+            window.updateSplatViewport();
+        }
+
+        // Clean up old scene
+        cleanupSceneFunc(true);
+
+        // No mask data available for raw PLY uploads
+        setFloorMaskData(null);
+        setWallMaskData(null);
+        setFloorOrientation('horizontal');
+
+        // Remove old splat
+        if (viewer.splatMesh) {
+            await viewer.removeSplatScene(0);
+        }
+
+        setSplatLoaded(false);
+
+        status.textContent = 'Loading splat scene...';
+
+        await viewer.addSplatScene(plyUrl, {
+            progressiveLoad: true
+        });
+
+        viewer.start();
+        setSplatLoaded(true);
+
+        // Clean up blob URL
+        URL.revokeObjectURL(plyUrl);
+
+        // Position camera
+        const cameraPosition = new THREE.Vector3(-0.22, -0.08684, 0.75);
+        const lookAtPoint = new THREE.Vector3(-0.22, -0.08684, 4.05811);
+        viewer.camera.position.copy(cameraPosition);
+        viewer.camera.lookAt(lookAtPoint);
+        if (viewer.controls) {
+            viewer.controls.target.copy(lookAtPoint);
+            viewer.controls.update();
+        }
+
+        // Enable detection buttons
+        const toggleFloorBtn = document.getElementById('toggleFloorBtn');
+        toggleFloorBtn.disabled = false;
+        toggleFloorBtn.textContent = 'Show Floor Detection';
+
+        const toggleWallBtn = document.getElementById('toggleWallBtn');
+        toggleWallBtn.disabled = false;
+        toggleWallBtn.textContent = 'Show Wall Detection';
+
+        const showWallClustersBtn = document.getElementById('showWallClustersBtn');
+        showWallClustersBtn.disabled = false;
+        showWallClustersBtn.textContent = 'Show Wall Clusters';
+
+        status.textContent = 'PLY loaded! Click "Place Rug" to select and place a rug.';
+        console.log('Splat loaded from PLY file successfully!');
+
+    } catch (error) {
+        console.error('Error loading PLY file:', error);
+        status.textContent = `Error loading PLY: ${error.message}`;
+        throw error;
+    } finally {
+        setIsLoadingScene(false);
+        if (splatSelect) {
+            splatSelect.disabled = false;
+        }
+    }
+}
+
+/**
  * Load a splat from a folder (containing room.ply + metadata.json)
  */
 export async function loadSplatFromFolder(folderPath, cleanupSceneFunc) {

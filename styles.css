@@ -71,7 +71,8 @@ body {
 #rugUploadContainer,
 #splatSelectContainer,
 #rugSelectContainer,
-#generateSplatContainer {
+#generateSplatContainer,
+#uploadPlyContainer {
     padding: 10px;
     background: #1f1f1f;
     border-radius: 4px;
@@ -82,7 +83,8 @@ body {
 #rugUploadContainer label,
 #splatSelectContainer label,
 #rugSelectContainer label,
-#generateSplatContainer label {
+#generateSplatContainer label,
+#uploadPlyContainer label {
     color: #ebebeb;
     font-size: 11px;
     display: block;
@@ -91,7 +93,8 @@ body {
 }
 
 #rugImageInput,
-#generateSplatInput {
+#generateSplatInput,
+#uploadPlyInput {
     font-size: 11px;
     color: #ebebeb;
     width: 100%;

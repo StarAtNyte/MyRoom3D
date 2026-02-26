@@ -6,7 +6,7 @@ import {
     setWallClusterHelpers, setWallClusters, wallDecor, rug,
     initialCameraState
 } from './utils.js';
-import { generateSplatFromImage, downloadGeneratedPLY, loadSplatFromFolder } from './api.js';
+import { generateSplatFromImage, downloadGeneratedPLY, loadSplatFromFolder, loadSplatFromPlyFile } from './api.js';
 import { detectFloor, createFloorPlaneVisualization } from './floorDetection.js';
 import { detectWall, collectWallGaussians, clusterWallsByOrientation } from './wallDetection.js';
 import { placeRugAuto, removeCurrentRug } from './rug.js';
@@ -350,6 +350,13 @@ export function initializeUI(cleanupSceneFunc) {
         const selectedFile = fileInput.files[0];
         if (selectedFile) {
             await generateSplatFromImage(selectedFile, cleanupSceneFunc);
+        }
+    });
+
+    document.getElementById('uploadPlyInput').addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            await loadSplatFromPlyFile(file, cleanupSceneFunc);
         }
     });
 
