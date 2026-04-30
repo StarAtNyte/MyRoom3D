@@ -257,7 +257,8 @@ export async function loadGeneratedSplat(cleanupSceneFunc) {
         console.log('Loading splat from data URL');
 
         const loadPromise = viewer.addSplatScene(dataUrl, {
-            progressiveLoad: true
+            progressiveLoad: true,
+            format: 0 // SceneFormat.Ply - required for data URLs without file extension
         });
 
         const timeoutPromise = new Promise((_, reject) =>
@@ -427,7 +428,8 @@ export async function loadSplatFromPlyFile(plyFile, cleanupSceneFunc) {
         status.textContent = 'Loading splat scene...';
 
         await viewer.addSplatScene(plyUrl, {
-            progressiveLoad: true
+            progressiveLoad: true,
+            format: 0 // SceneFormat.Ply - required for blob URLs without file extension
         });
 
         viewer.start();
